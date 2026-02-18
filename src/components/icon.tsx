@@ -4,7 +4,7 @@ import * as React from "react";
 
 import { cn } from "../lib/utils";
 
-interface DynamicIconProps {
+export interface IconProps {
   /**
    * Icon name in format: prefix/name or prefix:name
    * Examples: "lucide/home", "mdi:account", "heroicons/check"
@@ -51,21 +51,21 @@ const svgCache = new Map<string, string>();
  * ```tsx
  * // Icon inherits color from parent (recommended for hover states, etc.)
  * <span className="text-white hover:text-red-500">
- *   <DynamicIcon name="lucide/home" size={24} />
+ *   <Icon name="lucide/home" size={24} />
  * </span>
  *
  * // Icon with explicit color
- * <DynamicIcon name="mdi:account" size={32} color="#ff0000" />
+ * <Icon name="mdi:account" size={32} color="#ff0000" />
  * ```
  */
-export function DynamicIcon({
+export function Icon({
   name,
   size = 28,
   color,
   className,
   alt,
   apiKey,
-}: DynamicIconProps) {
+}: IconProps) {
   const [svgContent, setSvgContent] = React.useState<string | null>(null);
   const [isLoading, setIsLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
