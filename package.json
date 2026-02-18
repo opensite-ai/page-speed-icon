@@ -1,16 +1,16 @@
 {
   "name": "@page-speed/icon",
-  "version": "0.0.1",
-  "description": "TODO",
+  "version": "0.1.0",
+  "description": "Performance-optimized dynamic icon component for DashTrack and OpenSite apps.",
   "keywords": [
     "react",
-    "maplibre",
     "icons",
+    "iconify",
     "page-speed",
     "tree-shakable",
     "opensite"
   ],
-  "homepage": "https://github.com/opensite-ai/page-speed-icon",
+  "homepage": "https://github.com/opensite-ai/page-speed-icon#readme",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/opensite-ai/page-speed-icon.git"
@@ -34,7 +34,43 @@
   "publishConfig": {
     "access": "public"
   },
-  "exports": {},
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./core": {
+      "types": "./dist/core/index.d.ts",
+      "import": "./dist/core/index.js",
+      "require": "./dist/core/index.cjs"
+    },
+    "./core/icon": {
+      "types": "./dist/core/Icon.d.ts",
+      "import": "./dist/core/Icon.js",
+      "require": "./dist/core/Icon.cjs"
+    },
+    "./types": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/types/index.js",
+      "require": "./dist/types/index.cjs"
+    },
+    "./utils": {
+      "types": "./dist/utils/index.d.ts",
+      "import": "./dist/utils/index.js",
+      "require": "./dist/utils/index.cjs"
+    },
+    "./utils/icon-url": {
+      "types": "./dist/utils/iconUrl.d.ts",
+      "import": "./dist/utils/iconUrl.js",
+      "require": "./dist/utils/iconUrl.cjs"
+    },
+    "./utils/svg": {
+      "types": "./dist/utils/svg.d.ts",
+      "import": "./dist/utils/svg.js",
+      "require": "./dist/utils/svg.cjs"
+    }
+  },
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
@@ -50,11 +86,8 @@
     "react": ">=18.0.0",
     "react-dom": ">=18.0.0"
   },
-  "dependencies": {
-    "clsx": "^2.1.1",
-    "tailwind-merge": "^3.4.1"
-  },
   "devDependencies": {
+    "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.0",
     "@types/node": "^24.10.0",

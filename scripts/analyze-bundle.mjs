@@ -5,8 +5,9 @@ import path from "node:path";
 const files = [
   "dist/index.js",
   "dist/index.cjs",
-  "dist/core/MapLibre.js",
-  "dist/utils/getMapLibreStyleUrl.js"
+  "dist/core/Icon.js",
+  "dist/utils/iconUrl.js",
+  "dist/utils/svg.js"
 ];
 
 function formatBytes(bytes) {
