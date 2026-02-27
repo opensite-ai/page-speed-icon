@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { act, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, vi } from "vitest";
 
 import { Icon } from "../src/core/Icon";
@@ -23,7 +23,9 @@ describe("Icon", () => {
       .spyOn(globalThis, "fetch")
       .mockResolvedValue(createFetchResponse('<svg><path fill="#000"/></svg>'));
 
-    render(<Icon name="lucide/home" size={24} apiKey="abc123" alt="Home" />);
+    await act(async () => {
+      render(<Icon name="lucide/home" size={24} apiKey="abc123" alt="Home" />);
+    });
 
     const icon = await screen.findByRole("img", { name: "Home" });
     expect(icon).toHaveAttribute("data-state", "ready");
@@ -43,14 +45,16 @@ describe("Icon", () => {
       createFetchResponse("", false, 401)
     );
 
-    render(
-      <Icon
-        name="lucide/home"
-        apiKey="bad-key"
-        alt="Home"
-        fallback={<span data-testid="icon-fallback">x</span>}
-      />
-    );
+    await act(async () => {
+      render(
+        <Icon
+          name="lucide/home"
+          apiKey="bad-key"
+          alt="Home"
+          fallback={<span data-testid="icon-fallback">x</span>}
+        />
+      );
+    });
 
     await waitFor(() => {
       expect(screen.getByTestId("icon-fallback")).toBeInTheDocument();
@@ -67,12 +71,14 @@ describe("Icon", () => {
       .spyOn(globalThis, "fetch")
       .mockResolvedValue(createFetchResponse('<svg><path stroke="#000"/></svg>'));
 
-    render(
-      <>
-        <Icon name="lucide/home" apiKey="abc123" />
-        <Icon name="lucide/home" apiKey="abc123" />
-      </>
-    );
+    await act(async () => {
+      render(
+        <>
+          <Icon name="lucide/home" apiKey="abc123" />
+          <Icon name="lucide/home" apiKey="abc123" />
+        </>
+      );
+    });
 
     await waitFor(() => {
       const rendered = screen.getAllByRole("img", { name: "home" });
@@ -86,14 +92,16 @@ describe("Icon", () => {
   });
 
   it("handles invalid icon name as error state", async () => {
-    render(
-      <Icon
-        name="invalid-name"
-        apiKey="abc123"
-        alt="Broken"
-        fallback={<span data-testid="icon-fallback">x</span>}
-      />
-    );
+    await act(async () => {
+      render(
+        <Icon
+          name="invalid-name"
+          apiKey="abc123"
+          alt="Broken"
+          fallback={<span data-testid="icon-fallback">x</span>}
+        />
+      );
+    });
 
     await waitFor(() => {
       expect(screen.getByTestId("icon-fallback")).toBeInTheDocument();

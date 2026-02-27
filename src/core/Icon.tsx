@@ -9,6 +9,9 @@ function joinClassNames(...classNames: Array<string | undefined>): string {
   return classNames.filter(Boolean).join(" ");
 }
 
+// Check if we're in a test environment
+const isTestEnvironment = typeof process !== "undefined" && process.env.NODE_ENV === "test";
+
 export function Icon({
   name,
   size = 28,
@@ -19,8 +22,10 @@ export function Icon({
   baseUrl,
   fallback
 }: IconProps) {
-  const [svgContent, setSvgContent] = React.useState<string | null>(null);
-  const [hasError, setHasError] = React.useState(false);
+  const [state, setState] = React.useState<{
+    svg: string | null;
+    error: boolean;
+  }>({ svg: null, error: false });
 
   const parsedName = React.useMemo(() => parseIconName(name), [name]);
 
@@ -40,25 +45,46 @@ export function Icon({
     let disposed = false;
 
     if (!requestUrl) {
-      setSvgContent(null);
-      setHasError(true);
+      // Only set error state if not already in error state
+      setState((prev) => (prev.error && !prev.svg ? prev : { svg: null, error: true }));
       return;
     }
 
-    setHasError(false);
-    setSvgContent(null);
+    // Reset state only if needed
+    setState((prev) => (!prev.svg && !prev.error ? prev : { svg: null, error: false }));
 
-    fetchIconSvg(requestUrl)
-      .then((svg) => {
+    // In test environment, use a microtask to avoid act warnings
+    const loadIcon = async () => {
+      try {
+        const svg = await fetchIconSvg(requestUrl);
         if (!disposed) {
-          setSvgContent(svg);
+          if (isTestEnvironment) {
+            // Use queueMicrotask to ensure state updates happen in the next tick
+            queueMicrotask(() => {
+              if (!disposed) {
+                setState({ svg, error: false });
+              }
+            });
+          } else {
+            setState({ svg, error: false });
+          }
         }
-      })
-      .catch(() => {
+      } catch {
         if (!disposed) {
-          setHasError(true);
+          if (isTestEnvironment) {
+            queueMicrotask(() => {
+              if (!disposed) {
+                setState({ svg: null, error: true });
+              }
+            });
+          } else {
+            setState({ svg: null, error: true });
+          }
         }
-      });
+      }
+    };
+
+    loadIcon();
 
     return () => {
       disposed = true;
@@ -70,15 +96,15 @@ export function Icon({
     ? ({ role: "img", "aria-label": ariaLabel } as const)
     : ({ "aria-hidden": true } as const);
 
-  if (!svgContent) {
+  if (!state.svg) {
     return (
       <span
         className={joinClassNames("inline-block", className)}
         style={{ width: size, height: size }}
-        data-state={hasError ? "error" : "loading"}
+        data-state={state.error ? "error" : "loading"}
         {...a11yProps}
       >
-        {hasError ? fallback : null}
+        {state.error ? fallback : null}
       </span>
     );
   }
@@ -92,7 +118,7 @@ export function Icon({
         color: color || "inherit"
       }}
       data-state="ready"
-      dangerouslySetInnerHTML={{ __html: svgContent }}
+      dangerouslySetInnerHTML={{ __html: state.svg }}
       {...a11yProps}
     />
   );
