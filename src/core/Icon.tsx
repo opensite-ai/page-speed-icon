@@ -9,9 +9,6 @@ function joinClassNames(...classNames: Array<string | undefined>): string {
   return classNames.filter(Boolean).join(" ");
 }
 
-// Check if we're in a test environment
-const isTestEnvironment = typeof process !== "undefined" && process.env.NODE_ENV === "test";
-
 export function Icon({
   name,
   size = 28,
@@ -20,7 +17,7 @@ export function Icon({
   alt,
   apiKey,
   baseUrl,
-  fallback
+  fallback,
 }: IconProps) {
   const [state, setState] = React.useState<{
     svg: string | null;
@@ -46,40 +43,27 @@ export function Icon({
 
     if (!requestUrl) {
       // Only set error state if not already in error state
-      setState((prev) => (prev.error && !prev.svg ? prev : { svg: null, error: true }));
+      setState((prev) =>
+        prev.error && !prev.svg ? prev : { svg: null, error: true },
+      );
       return;
     }
 
     // Reset state only if needed
-    setState((prev) => (!prev.svg && !prev.error ? prev : { svg: null, error: false }));
+    setState((prev) =>
+      !prev.svg && !prev.error ? prev : { svg: null, error: false },
+    );
 
     // In test environment, use a microtask to avoid act warnings
     const loadIcon = async () => {
       try {
         const svg = await fetchIconSvg(requestUrl);
         if (!disposed) {
-          if (isTestEnvironment) {
-            // Use queueMicrotask to ensure state updates happen in the next tick
-            queueMicrotask(() => {
-              if (!disposed) {
-                setState({ svg, error: false });
-              }
-            });
-          } else {
-            setState({ svg, error: false });
-          }
+          setState({ svg, error: false });
         }
       } catch {
         if (!disposed) {
-          if (isTestEnvironment) {
-            queueMicrotask(() => {
-              if (!disposed) {
-                setState({ svg: null, error: true });
-              }
-            });
-          } else {
-            setState({ svg: null, error: true });
-          }
+          setState({ svg: null, error: true });
         }
       }
     };
@@ -91,10 +75,15 @@ export function Icon({
     };
   }, [requestUrl]);
 
-  const ariaLabel = alt || parsedName?.iconName;
-  const a11yProps = ariaLabel
-    ? ({ role: "img", "aria-label": ariaLabel } as const)
-    : ({ "aria-hidden": true } as const);
+  const ariaLabel = React.useMemo(() => {
+    return alt || parsedName?.iconName;
+  }, [alt, parsedName?.iconName]);
+
+  const a11yProps = React.useMemo(() => {
+    return ariaLabel
+      ? ({ role: "img", "aria-label": ariaLabel } as const)
+      : ({ "aria-hidden": true } as const);
+  }, [ariaLabel]);
 
   if (!state.svg) {
     return (
@@ -111,11 +100,14 @@ export function Icon({
 
   return (
     <span
-      className={joinClassNames("inline-flex items-center justify-center", className)}
+      className={joinClassNames(
+        "inline-flex items-center justify-center",
+        className,
+      )}
       style={{
         width: size,
         height: size,
-        color: color || "inherit"
+        color: color || "inherit",
       }}
       data-state="ready"
       dangerouslySetInnerHTML={{ __html: state.svg }}

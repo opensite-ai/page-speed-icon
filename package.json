@@ -1,6 +1,6 @@
 {
   "name": "@page-speed/icon",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Performance-optimized dynamic icon component for DashTrack and OpenSite apps.",
   "keywords": [
     "react",
@@ -19,7 +19,7 @@
     "url": "https://github.com/opensite-ai/page-speed-icon/issues"
   },
   "author": "OpenSite AI (https://opensite.ai)",
-  "license": "MIT",
+  "license": "BSD-3-Clause",
   "private": false,
   "type": "module",
   "main": "./dist/index.cjs",
