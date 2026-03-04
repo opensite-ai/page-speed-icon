@@ -9,7 +9,7 @@ function joinClassNames(...classNames: Array<string | undefined>): string {
   return classNames.filter(Boolean).join(" ");
 }
 
-export function Icon({
+function IconComponent({
   name,
   size = 28,
   color,
@@ -115,5 +115,21 @@ export function Icon({
     />
   );
 }
+
+function areIconPropsEqual(previous: IconProps, next: IconProps): boolean {
+  return (
+    previous.name === next.name &&
+    previous.size === next.size &&
+    previous.color === next.color &&
+    previous.className === next.className &&
+    previous.alt === next.alt &&
+    previous.apiKey === next.apiKey &&
+    previous.baseUrl === next.baseUrl &&
+    previous.fallback === next.fallback
+  );
+}
+
+export const Icon = React.memo(IconComponent, areIconPropsEqual);
+Icon.displayName = "Icon";
 
 export const DynamicIcon = Icon;
